@@ -4,15 +4,17 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 
-public class Player extends Character{
+public class Player extends GraphicObject {
     protected Bitmap bitMap;
     protected Rect hitBox;
+    protected int lives;
 
     //Set moving whether left or right
     private boolean isMoving;
 
     public Player(Context context, int screenWidth, int screenHeight, Bitmap bitMap){
         super(context, screenWidth, screenHeight, bitMap);
+        xSpeed = 10;
         this.bitMap = bitMap;
         this.hitBox = new Rect(x, y, this.bitMap.getWidth(), this.bitMap.getHeight());
     }
