@@ -1,24 +1,30 @@
 package edu.utep.cs4381.melonlord.model;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Rect;
 
-public class Player extends GameObject{
+public class Player extends Character{
+    protected Bitmap bitMap;
+    protected Rect hitBox;
 
-    public Player(Context context, int screenWidth, int screenHeight) {
-        super(context, screenWidth, screenHeight);
-        // Setup in te middle
-        x = screenWidth/2;
-        // TODO : Find a good speed for this.
-        xSpeed = 10;
-        y = screenHeight;
-        ySpeed = 0;
+    //Set moving whether left or right
+    private boolean isMoving;
 
+    public Player(Context context, int screenWidth, int screenHeight, Bitmap bitMap){
+        super(context, screenWidth, screenHeight, bitMap);
+        this.bitMap = bitMap;
+        this.hitBox = new Rect(x, y, this.bitMap.getWidth(), this.bitMap.getHeight());
     }
 
+    //Set moveLR to flag; true if moving, false otherwise
+    public void setMoveLR(boolean flag){ isMoving = flag; }
 
+    public void update(int s){
+        //If player is moving, add speed
+        if(isMoving){
 
-    @Override
-    protected void update() {
-
+        }
     }
+
 }

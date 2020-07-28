@@ -4,23 +4,14 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 
-import androidx.annotation.Nullable;
+import java.util.Random;
 
 public abstract class GameObject {
-    protected Context context;
-    protected int screenX;
-    protected int screenY;
-    protected int x;
-    protected int xSpeed;
-    protected int y;
-    protected int ySpeed;
-    @Nullable
-    protected Bitmap bitmap;
-    @Nullable
-    protected Rect hitbox;
+
+    protected int screenX, screenY, x, y, xSpeed, ySpeed;
+    protected static final Random rand = new Random();
 
     public GameObject(Context context, int screenWidth, int screenHeight) {
-        context = context;
         screenX = screenWidth;
         screenY = screenHeight;
         x = 0;
@@ -29,13 +20,12 @@ public abstract class GameObject {
         ySpeed = 0;
     }
 
-    protected void setBitmap(@Nullable Bitmap bitmap) {
-        bitmap = bitmap;
-    }
+    public int getX(){ return x; }
+    public int getY(){ return y; }
+    public int getSpeedX(){ return xSpeed; }
+    public int getSpeedY(){ return ySpeed; }
 
-    protected abstract void update();
+    //Update is abstract and has its own implementation for Player and Villain
+    public abstract void update(int speed);
 
-    public Rect getHitbox() {
-        return hitbox;
-    }
 }
