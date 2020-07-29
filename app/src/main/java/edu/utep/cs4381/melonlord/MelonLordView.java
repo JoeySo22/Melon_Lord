@@ -69,7 +69,8 @@ public class MelonLordView extends SurfaceView implements Runnable{
                 BitmapFactory.decodeResource(context.getResources(), R.drawable.bg_view));
         // Add all fireballs
         for (int i = 0; i < 5; i++)
-            goList.add(new FireBall(context,screenWidth,screenHeight, R.drawable.fireball));
+            goList.add(new FireBall(context,screenWidth,screenHeight,
+                    BitmapFactory.decodeResource(context.getResources(), R.drawable.fireball)));
 
         // Only 1 powerup per session
         powerUp = new PowerUp(context,screenWidth,screenHeight,
