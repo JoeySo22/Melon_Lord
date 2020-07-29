@@ -11,6 +11,9 @@ import android.view.SurfaceView;
 import edu.utep.cs4381.melonlord.model.Player;
 import edu.utep.cs4381.melonlord.model.VillainBackground;
 
+/** @author: Jose Eduardo Soto <jesoto4@miners.utep.edu>
+*   @author:        Ruth Trejo <rtrejo9@miners.utep.edu>
+*/
 public class MelonLordView extends SurfaceView implements Runnable{
 
     private final Context context;

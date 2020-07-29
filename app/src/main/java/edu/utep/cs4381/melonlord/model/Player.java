@@ -1,8 +1,8 @@
 package edu.utep.cs4381.melonlord.model;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Rect;
+        import android.content.Context;
+        import android.graphics.Bitmap;
+        import android.graphics.Rect;
 
 public class Player extends GraphicObject {
     protected Bitmap bitMap;
