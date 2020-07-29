@@ -1,9 +1,6 @@
 package edu.utep.cs4381.melonlord.model;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Rect;
-
 import java.util.Random;
 
 public abstract class GameObject {
