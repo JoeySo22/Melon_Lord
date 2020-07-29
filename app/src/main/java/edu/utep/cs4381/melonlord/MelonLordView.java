@@ -8,7 +8,12 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import edu.utep.cs4381.melonlord.model.FireBall;
+import edu.utep.cs4381.melonlord.model.GameObject;
 import edu.utep.cs4381.melonlord.model.Player;
+import edu.utep.cs4381.melonlord.model.PowerUp;
 import edu.utep.cs4381.melonlord.model.VillainBackground;
 
 /** @author: Jose Eduardo Soto <jesoto4@miners.utep.edu>
@@ -36,6 +41,13 @@ public class MelonLordView extends SurfaceView implements Runnable{
 
     private Player player;
     private VillainBackground melonLord;
+    private CopyOnWriteArrayList<GameObject> goList = new CopyOnWriteArrayList<>();
+    private PowerUp powerUp;
+    private int xLeftButtonCoord;
+    private int yLeftButtonCoord;
+    private int xRightButtonCoord;
+    private int yRightButtonCoord;
+    private int padding;
 
     public MelonLordView(Context context, int screenWidth, int screenHeight) {
         super(context);
@@ -55,6 +67,13 @@ public class MelonLordView extends SurfaceView implements Runnable{
                 R.drawable.sokka));
         melonLord = new VillainBackground(context, x, y,
                 BitmapFactory.decodeResource(context.getResources(), R.drawable.bg_view));
+        // Add all fireballs
+        for (int i = 0; i < 5; i++)
+            goList.add(new FireBall(context,screenWidth,screenHeight, R.drawable.fireball));
+
+        // Only 1 powerup per session
+        powerUp = new PowerUp(context,screenWidth,screenHeight,
+                BitmapFactory.decodeResource(context.getResources(),R.drawable.armor));
         gameEnded = false;
 
     }//end startGame
@@ -93,6 +112,10 @@ public class MelonLordView extends SurfaceView implements Runnable{
     private void update(){
         //update player speed
         player.update(0);
+        powerUp.update(0);
+        for (GameObject go: goList) {
+            go.update(0);
+        }
     }//end update
 
     private void draw(){
@@ -103,6 +126,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
             canvas.drawBitmap(player.getBitMap(),player.getX(), player.getY(), paint);
 
 
+            // DrawButtons
             holder.unlockCanvasAndPost(canvas);
         }
     }//end draw
@@ -111,12 +135,10 @@ public class MelonLordView extends SurfaceView implements Runnable{
     public boolean onTouchEvent(MotionEvent event) {
         switch( event.getActionMasked() ){
             case MotionEvent.ACTION_DOWN:
-                player.setMoveLR(true);
-                if(gameEnded)
-                    startGame(context,screenWidth,screenHeight);
+
                 break;
             case MotionEvent.ACTION_UP:
-                player.setMoveLR(false);
+
                 break;
         }
         return true;

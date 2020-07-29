@@ -17,5 +17,7 @@ public abstract class GraphicObject extends GameObject {
 
     public Bitmap getBitMap(){ return bitMap; }
     public Rect getHitBox(){ return hitBox; }
+    protected abstract void spawn();
+    protected abstract void destroy();
 
 }

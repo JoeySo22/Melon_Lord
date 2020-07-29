@@ -7,6 +7,7 @@ public abstract class GameObject {
 
     protected int screenX, screenY, x, y, xSpeed, ySpeed;
     protected static final Random rand = new Random();
+    protected boolean moving;
 
     public GameObject(Context context, int screenWidth, int screenHeight) {
         screenX = screenWidth;

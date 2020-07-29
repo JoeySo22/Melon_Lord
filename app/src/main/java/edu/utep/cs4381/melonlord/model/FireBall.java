@@ -2,6 +2,7 @@ package edu.utep.cs4381.melonlord.model;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 
 public class FireBall extends GraphicObject {
 
@@ -10,17 +11,24 @@ public class FireBall extends GraphicObject {
         ySpeed = 0;
     }
 
-    // Creates a fireball for the screen with varying speeds and positions.
-    protected void generateFireBall() {
-        x = rand.nextInt(screenX);
+    @Override
+    protected void spawn() {
+        x = rand.nextInt(screenX - bitMap.getWidth()) + bitMap.getWidth();
+        xSpeed = rand.nextInt(70) + 10;
         y = 0;
-        ySpeed = rand.nextInt(50) + 10;
+        hitBox = new Rect(x, y, bitMap.getWidth(), bitMap.getHeight());
+    }
+
+    @Override
+    protected void destroy() {
+        // Just call spawn again. We always need fireballs on the screen so this is logical.
+        spawn();
     }
 
     @Override
     public void update(int speed) {
         // If the fireball reaches the screen we regenerate.
-        if (y >= screenY) generateFireBall();
+        if (y >= screenY) destroy();
             // Otherwise we increment its transposition
         else y += ySpeed;
     }
