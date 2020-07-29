@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import edu.utep.cs4381.melonlord.model.FireBall;
@@ -41,7 +42,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
 
     private Player player;
     private VillainBackground melonLord;
-    private CopyOnWriteArrayList<GameObject> goList = new CopyOnWriteArrayList<>();
+    private List<FireBall> fireBallList = new CopyOnWriteArrayList<>();
     private PowerUp powerUp;
     private int xLeftButtonCoord;
     private int yLeftButtonCoord;
@@ -69,10 +70,10 @@ public class MelonLordView extends SurfaceView implements Runnable{
                 BitmapFactory.decodeResource(context.getResources(), R.drawable.bg_view));
         // Add all fireballs
         for (int i = 0; i < 5; i++)
-            goList.add(new FireBall(context,screenWidth,screenHeight,
+            fireBallList.add(new FireBall(context,screenWidth,screenHeight,
                     BitmapFactory.decodeResource(context.getResources(), R.drawable.fireball)));
 
-        // Only 1 powerup per session
+        // Only 1 PowerUp per session
         powerUp = new PowerUp(context,screenWidth,screenHeight,
                 BitmapFactory.decodeResource(context.getResources(),R.drawable.armor));
         gameEnded = false;
@@ -111,10 +112,15 @@ public class MelonLordView extends SurfaceView implements Runnable{
     }//end control
 
     private void update(){
+
         //update player speed
         player.update(0);
+
+        //update powerup speed
         powerUp.update(0);
-        for (GameObject go: goList) {
+
+        //update fireball speed
+        for (FireBall go: fireBallList) {
             go.update(0);
         }
     }//end update
@@ -122,10 +128,18 @@ public class MelonLordView extends SurfaceView implements Runnable{
     private void draw(){
         if(holder.getSurface().isValid()){
             canvas = holder.lockCanvas();
-            //Idk how to draw a background with an image :( maybe just a bitmap but idk
+
+            //Draw background image
             canvas.drawBitmap(melonLord.getBitMap(), melonLord.getX(), melonLord.getY(), paint);
+
+            //Draw the character, sokka, the player will be playing as
             canvas.drawBitmap(player.getBitMap(),player.getX(), player.getY(), paint);
 
+
+            //Draw fireballs falling down from top of the screen
+            for( FireBall fb: fireBallList ){
+                canvas.drawBitmap(fb.getBitMap(),fb.getX(), fb.getY(), paint);
+            }
 
             // DrawButtons
             holder.unlockCanvasAndPost(canvas);
