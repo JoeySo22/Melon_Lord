@@ -123,6 +123,8 @@ public class MelonLordView extends SurfaceView implements Runnable{
         for (FireBall go: fireBallList) {
             go.update(0);
         }
+
+
     }//end update
 
     private void draw(){
@@ -142,6 +144,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
             }
 
             // DrawButtons
+
             holder.unlockCanvasAndPost(canvas);
         }
     }//end draw
