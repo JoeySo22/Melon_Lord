@@ -1,9 +1,12 @@
 package edu.utep.cs4381.melonlord;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -41,7 +44,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
     private SurfaceHolder holder;
 
     private Player player;
-    private VillainBackground melonLord;
+    //private VillainBackground melonLord;
     private List<FireBall> fireBallList = new CopyOnWriteArrayList<>();
     private PowerUp powerUp;
     private int xLeftButtonCoord;
@@ -50,14 +53,25 @@ public class MelonLordView extends SurfaceView implements Runnable{
     private int yRightButtonCoord;
     private int padding;
 
+    //Drawing background image for game play to fit any phone screen
+    DisplayMetrics bgMetrics;
+    int width, height;
+    Bitmap bgBitmap;
+    Rect frameToDraw;
+    Rect whereToDraw;
+
     public MelonLordView(Context context, int screenWidth, int screenHeight) {
         super(context);
-        this.context = context;
-        this.screenWidth = screenWidth;
+        this.context      = context;
+        this.screenWidth  = screenWidth;
         this.screenHeight = screenHeight;
 
-        holder = getHolder();
-        paint  = new Paint();
+        holder            = getHolder();
+        paint             = new Paint();
+
+        bgMetrics         = context.getResources().getDisplayMetrics();
+        width             = bgMetrics.widthPixels;
+        height            = bgMetrics.heightPixels;
 
         startGame(context, screenWidth, screenHeight);
     }
@@ -65,10 +79,19 @@ public class MelonLordView extends SurfaceView implements Runnable{
     private void startGame(Context context, int x, int y){
         //Initialize player at the start of the game
         player = new Player(context, x, y, BitmapFactory.decodeResource(context.getResources(),
-                R.drawable.sokka));
-        melonLord = new VillainBackground(context, x, y,
-                BitmapFactory.decodeResource(context.getResources(), R.drawable.bg_view));
-        // Add all fireballs
+                R.drawable.sokka_13p_smaller));
+
+        //melonLord = new VillainBackground(context, x, y,
+               // BitmapFactory.decodeResource(context.getResources(), R.drawable.bg_view));
+
+        //Scale the BACKGROUND image to any phone screen when the game starts
+        bgBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.bg);
+        bgBitmap = Bitmap.createScaledBitmap(bgBitmap, width, height, false);
+
+        frameToDraw = new Rect(0, 0, bgBitmap.getWidth(), bgBitmap.getHeight());
+        whereToDraw = new Rect(0, 0, screenWidth, screenHeight);
+
+        // ADD ALL FIREBALL OBJECTS TO fireBallList
         for (int i = 0; i < 5; i++)
             fireBallList.add(new FireBall(context,screenWidth,screenHeight,
                     BitmapFactory.decodeResource(context.getResources(), R.drawable.fireball)));
@@ -130,7 +153,8 @@ public class MelonLordView extends SurfaceView implements Runnable{
             canvas = holder.lockCanvas();
 
             //Draw background image
-            canvas.drawBitmap(melonLord.getBitMap(), melonLord.getX(), melonLord.getY(), paint);
+            canvas.drawBitmap(bgBitmap, frameToDraw, whereToDraw, paint);
+            //canvas.drawBitmap(melonLord.getBitMap(), melonLord.getX(), melonLord.getY(), paint);
 
             //Draw the character, sokka, the player will be playing as
             canvas.drawBitmap(player.getBitMap(),player.getX(), player.getY(), paint);

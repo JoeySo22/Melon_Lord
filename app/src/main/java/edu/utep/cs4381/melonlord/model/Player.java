@@ -19,8 +19,8 @@ public class Player extends GraphicObject {
     public Player(Context context, int screenWidth, int screenHeight, Bitmap bitMap){
         super(context, screenWidth, screenHeight, bitMap);
         //player starts at these coordinates
-        this.x = (screenWidth/2) - 150;
-        this.y = (screenHeight/2) + 840;
+        this.x = (screenWidth/2) - (screenWidth/8);
+        this.y = (screenHeight/2) + (int) (screenHeight/3.3);
         movingLeft = false;
         movingRight = false;
         xSpeed = 20;
@@ -54,7 +54,6 @@ public class Player extends GraphicObject {
                     x += xSpeed;
             }
         }
-
         // Add more stuff
     }
 
@@ -65,6 +64,7 @@ public class Player extends GraphicObject {
         armor++;
         return true;
     }
+
     // true if player died from powerdown
     public boolean powerDown() {
         if (armor == 1){
