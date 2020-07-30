@@ -3,7 +3,6 @@ package edu.utep.cs4381.melonlord.model;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
-import android.util.Log;
 
 public class FireBall extends GraphicObject {
 
@@ -16,14 +15,13 @@ public class FireBall extends GraphicObject {
         maxY = screenY;
         minX = 0;
         minY = 0;
-        ySpeed = rand.nextInt(70) + 10;
         spawn();
     }
 
     @Override
     protected void spawn() {
         x = rand.nextInt(screenX - bitMap.getWidth()) + bitMap.getWidth();
-        ySpeed = rand.nextInt(70) + 10;
+        ySpeed = rand.nextInt(45) + 40;
         y = 0;
         hitBox = new Rect(x, y, bitMap.getWidth(), bitMap.getHeight());
     }
@@ -39,9 +37,6 @@ public class FireBall extends GraphicObject {
         // If the fireball reaches the screen we regenerate.
         if (y >= screenY) destroy();
             // Otherwise we increment its transposition
-        else  {
-            y += ySpeed;
-            Log.d("Fireball/Update", "y moving");
-        }
+        else y += ySpeed;
     }
 }

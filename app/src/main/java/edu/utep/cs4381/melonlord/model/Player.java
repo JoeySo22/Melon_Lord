@@ -20,7 +20,7 @@ public class Player extends GraphicObject {
         super(context, screenWidth, screenHeight, bitMap);
         //player starts at these coordinates
         this.x = (screenWidth/2) - (screenWidth/8);
-        this.y = (screenHeight/2) + (int) (screenHeight/3.3);
+        this.y = (screenHeight/2) + (int) (screenHeight/3.08);
         movingLeft = false;
         movingRight = false;
         xSpeed = 20;
