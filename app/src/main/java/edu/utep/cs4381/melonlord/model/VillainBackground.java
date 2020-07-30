@@ -3,6 +3,8 @@ package edu.utep.cs4381.melonlord.model;
 import android.content.Context;
 import android.graphics.Bitmap;
 
+import java.io.File;
+
 public class VillainBackground {
     protected int screenX, screenY, x, y;
     protected Bitmap bitMap;
@@ -18,4 +20,5 @@ public class VillainBackground {
     public int getX(){ return x; }
     public int getY(){ return y; }
     public Bitmap getBitMap(){ return bitMap; }
+
 }
