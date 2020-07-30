@@ -87,7 +87,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
         whereToDraw = new Rect(0, 0, screenWidth, screenHeight);
 
         // ADD ALL FIREBALL OBJECTS TO fireBallList
-        for (int i = 1; i <= 5; i++)
+        for (int i = 1; i <= 4; i++)
             fireBallList.add(new FireBall(context,screenWidth,screenHeight,
                     BitmapFactory.decodeResource(context.getResources(), R.drawable.fireball_smaller)));
 
@@ -143,6 +143,21 @@ public class MelonLordView extends SurfaceView implements Runnable{
         for (FireBall fb: fireBallList) {
             fb.update(0);
         }
+
+        // Check collisions with player and powerup
+        if (player.getHitBox().intersect(powerUp.getHitBox())) {
+            powerUp.destroy();
+            player.powerUp();
+        }
+        // Check collisions with player and fireball
+        for (FireBall fb: fireBallList) {
+            if (player.getHitBox().intersect(fb.getHitBox())) {
+                fb.destroy();
+                player.powerDown();
+            }
+        }
+
+        //
     }//end update
 
     private void draw(){
@@ -161,7 +176,8 @@ public class MelonLordView extends SurfaceView implements Runnable{
                 canvas.drawBitmap(fb.getBitMap(),fb.getX(), fb.getY(), paint);
             }
 
-            canvas.drawBitmap(powerUp.getBitMap(),powerUp.getX(), player.getY(), paint);
+            if (powerUp.isMoving())
+                canvas.drawBitmap(powerUp.getBitMap(),powerUp.getX(), powerUp.getY(), paint);
 
             // DrawButtons
             holder.unlockCanvasAndPost(canvas);

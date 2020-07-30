@@ -7,7 +7,8 @@ import android.graphics.Rect;
 public class Player extends GraphicObject {
 
     private static final int MAX_ARMOR = 5;
-    protected Bitmap bitMap;
+    protected Bitmap bitMapArmored;
+    protected Bitmap bitmapUnarmored;
     protected Rect hitBox;
     protected int armor;
     public boolean playerIsAlive;
@@ -16,11 +17,13 @@ public class Player extends GraphicObject {
     private boolean movingLeft;
     private boolean movingRight;
 
-    public Player(Context context, int screenWidth, int screenHeight, Bitmap bitMap){
-        super(context, screenWidth, screenHeight, bitMap);
+    public Player(Context context, int screenWidth, int screenHeight, Bitmap noArmor, Bitmap armor){
+        super(context, screenWidth, screenHeight, noArmor);
         //player starts at these coordinates
-        this.x = (screenWidth/2) - (screenWidth/8);
-        this.y = (screenHeight/2) + (int) (screenHeight/3.08);
+        bitmapUnarmored = noArmor;
+        bitMapArmored = armor;
+        this.x = (screenWidth/2) - (bitMap.getWidth()/2);
+        this.y = screenHeight - bitMap.getHeight();
         movingLeft = false;
         movingRight = false;
         xSpeed = 20;
@@ -50,11 +53,14 @@ public class Player extends GraphicObject {
                     x -= xSpeed;
             }
             if (movingRight) {
-                if (x <= screenX)
+                if (x <= screenWidth)
                     x += xSpeed;
             }
         }
         // Add more stuff
+        if (armor == 1)
+            bitMap = bitmapUnarmored;
+        else bitMap = bitMapArmored;
     }
 
     // false if max armor has been reached

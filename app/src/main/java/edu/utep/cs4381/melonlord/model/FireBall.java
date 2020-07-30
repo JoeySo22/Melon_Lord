@@ -11,8 +11,8 @@ public class FireBall extends GraphicObject {
     private int maxX, minX;
     public FireBall(Context context, int screenWidth, int screenHeight, Bitmap bitmap) {
         super(context, screenWidth, screenHeight, bitmap);
-        maxX = screenX;
-        maxY = screenY;
+        maxX = this.screenWidth;
+        maxY = this.screenHeight;
         minX = 0;
         minY = 0;
         spawn();
@@ -20,14 +20,14 @@ public class FireBall extends GraphicObject {
 
     @Override
     protected void spawn() {
-        x = rand.nextInt(screenX - bitMap.getWidth()) + bitMap.getWidth();
+        x = rand.nextInt(screenWidth - bitMap.getWidth());
         ySpeed = rand.nextInt(45) + 40;
         y = 0;
         hitBox = new Rect(x, y, bitMap.getWidth(), bitMap.getHeight());
     }
 
     @Override
-    protected void destroy() {
+    public void destroy() {
         // Just call spawn again. We always need fireballs on the screen so this is logical.
         spawn();
     }
@@ -35,7 +35,7 @@ public class FireBall extends GraphicObject {
     @Override
     public void update(int speed) {
         // If the fireball reaches the screen we regenerate.
-        if (y >= screenY) destroy();
+        if (y >= screenHeight) destroy();
             // Otherwise we increment its transposition
         else y += ySpeed;
     }
