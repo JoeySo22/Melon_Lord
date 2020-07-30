@@ -15,13 +15,13 @@ public class FireBall extends GraphicObject {
         maxY = screenY;
         minX = 0;
         minY = 0;
-        ySpeed = rand.nextInt(70) + 10;
+        spawn();
     }
 
     @Override
     protected void spawn() {
         x = rand.nextInt(screenX - bitMap.getWidth()) + bitMap.getWidth();
-        ySpeed = rand.nextInt(70) + 10;
+        ySpeed = rand.nextInt(45) + 40;
         y = 0;
         hitBox = new Rect(x, y, bitMap.getWidth(), bitMap.getHeight());
     }

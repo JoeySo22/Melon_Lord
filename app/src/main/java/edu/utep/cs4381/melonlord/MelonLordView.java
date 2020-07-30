@@ -77,7 +77,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
     private void startGame(Context context, int x, int y){
         //Initialize player at the start of the game
         player = new Player(context, x, y, BitmapFactory.decodeResource(context.getResources(),
-                R.drawable.sokka_13p_smaller));
+                R.drawable.sokka_10p_smaller));
 
         //Scale the BACKGROUND image to any phone screen when the game starts
         bgBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.bg);
@@ -87,9 +87,9 @@ public class MelonLordView extends SurfaceView implements Runnable{
         whereToDraw = new Rect(0, 0, screenWidth, screenHeight);
 
         // ADD ALL FIREBALL OBJECTS TO fireBallList
-        for (int i = 0; i < 5; i++)
+        for (int i = 1; i <= 5; i++)
             fireBallList.add(new FireBall(context,screenWidth,screenHeight,
-                    BitmapFactory.decodeResource(context.getResources(), R.drawable.fireball)));
+                    BitmapFactory.decodeResource(context.getResources(), R.drawable.fireball_smaller)));
 
         // Only 1 PowerUp per session
         powerUp = new PowerUp(context,screenWidth,screenHeight,
