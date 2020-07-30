@@ -7,15 +7,22 @@ import android.util.Log;
 
 public class FireBall extends GraphicObject {
 
+    //Move vertically from up to down
+    private int maxY, minY;
+    private int maxX, minX;
     public FireBall(Context context, int screenWidth, int screenHeight, Bitmap bitmap) {
         super(context, screenWidth, screenHeight, bitmap);
-        ySpeed = 0;
+        maxX = screenX;
+        maxY = screenY;
+        minX = 0;
+        minY = 0;
+        ySpeed = rand.nextInt(70) + 10;
     }
 
     @Override
     protected void spawn() {
         x = rand.nextInt(screenX - bitMap.getWidth()) + bitMap.getWidth();
-        xSpeed = rand.nextInt(70) + 10;
+        ySpeed = rand.nextInt(70) + 10;
         y = 0;
         hitBox = new Rect(x, y, bitMap.getWidth(), bitMap.getHeight());
     }
