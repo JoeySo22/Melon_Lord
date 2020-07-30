@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -100,6 +101,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
         powerUp = new PowerUp(context,screenWidth,screenHeight,
                 BitmapFactory.decodeResource(context.getResources(),R.drawable.armor));
         gameEnded = false;
+        isPlaying = true;
 
     }//end startGame
 
@@ -144,6 +146,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
 
         //update fireball speed
         for (FireBall go: fireBallList) {
+            Log.d("MelonLordView/Update", "updating fireball");
             go.update(0);
         }
 
