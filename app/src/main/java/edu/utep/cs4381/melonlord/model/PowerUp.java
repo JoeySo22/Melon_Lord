@@ -39,7 +39,7 @@ public class PowerUp extends GraphicObject {
             y += ySpeed;
         } else {
             // Logic to get it spawned
-            if (rand.nextDouble() <= .01)
+            if (rand.nextDouble() <= .05)
                 spawn();
         }
         if (y >= screenY) destroy();

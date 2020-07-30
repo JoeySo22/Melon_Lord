@@ -17,6 +17,7 @@ public class FireBall extends GraphicObject {
         minX = 0;
         minY = 0;
         ySpeed = rand.nextInt(70) + 10;
+        spawn();
     }
 
     @Override

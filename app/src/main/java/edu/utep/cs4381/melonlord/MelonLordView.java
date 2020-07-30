@@ -161,6 +161,8 @@ public class MelonLordView extends SurfaceView implements Runnable{
                 canvas.drawBitmap(fb.getBitMap(),fb.getX(), fb.getY(), paint);
             }
 
+            canvas.drawBitmap(powerUp.getBitMap(),powerUp.getX(), player.getY(), paint);
+
             // DrawButtons
             holder.unlockCanvasAndPost(canvas);
         }
