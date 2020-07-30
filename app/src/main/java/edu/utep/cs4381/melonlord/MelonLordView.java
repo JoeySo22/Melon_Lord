@@ -15,14 +15,13 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import edu.utep.cs4381.melonlord.model.FireBall;
-import edu.utep.cs4381.melonlord.model.GameObject;
 import edu.utep.cs4381.melonlord.model.Player;
 import edu.utep.cs4381.melonlord.model.PowerUp;
-import edu.utep.cs4381.melonlord.model.VillainBackground;
 
-/** @author: Jose Eduardo Soto <jesoto4@miners.utep.edu>
-*   @author:        Ruth Trejo <rtrejo9@miners.utep.edu>
-*/
+/** Authors:
+ *  Jose Eduardo Soto <jesoto4@miners.utep.edu>
+ *   Ruth Trejo <rtrejo9@miners.utep.edu>
+ */
 public class MelonLordView extends SurfaceView implements Runnable{
 
     private final Context context;
@@ -44,7 +43,6 @@ public class MelonLordView extends SurfaceView implements Runnable{
     private SurfaceHolder holder;
 
     private Player player;
-    //private VillainBackground melonLord;
     private List<FireBall> fireBallList = new CopyOnWriteArrayList<>();
     private PowerUp powerUp;
     private int xLeftButtonCoord;
@@ -80,9 +78,6 @@ public class MelonLordView extends SurfaceView implements Runnable{
         //Initialize player at the start of the game
         player = new Player(context, x, y, BitmapFactory.decodeResource(context.getResources(),
                 R.drawable.sokka_13p_smaller));
-
-        //melonLord = new VillainBackground(context, x, y,
-               // BitmapFactory.decodeResource(context.getResources(), R.drawable.bg_view));
 
         //Scale the BACKGROUND image to any phone screen when the game starts
         bgBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.bg);
@@ -122,7 +117,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
         isPlaying = false;
         try {
             gameThread.join();
-        } catch (InterruptedException e) { }
+        } catch (InterruptedException e) { System.out.println(e);}
     }//end pause
 
     private void control() {
@@ -130,7 +125,9 @@ public class MelonLordView extends SurfaceView implements Runnable{
             // This slows down our CPU so that we can catch frames and changes.
             // tempo of the game, can increase or decrease.
             gameThread.sleep(17); // in milliseconds
-        } catch (InterruptedException e) { }
+        } catch (InterruptedException e) {
+            System.out.print(e);
+        }
 
     }//end control
 
@@ -143,8 +140,8 @@ public class MelonLordView extends SurfaceView implements Runnable{
         powerUp.update(0);
 
         //update fireball speed
-        for (FireBall go: fireBallList) {
-            go.update(0);
+        for (FireBall fb: fireBallList) {
+            fb.update(0);
         }
     }//end update
 
@@ -154,7 +151,6 @@ public class MelonLordView extends SurfaceView implements Runnable{
 
             //Draw background image
             canvas.drawBitmap(bgBitmap, frameToDraw, whereToDraw, paint);
-            //canvas.drawBitmap(melonLord.getBitMap(), melonLord.getX(), melonLord.getY(), paint);
 
             //Draw the character, sokka, the player will be playing as
             canvas.drawBitmap(player.getBitMap(),player.getX(), player.getY(), paint);
@@ -174,7 +170,8 @@ public class MelonLordView extends SurfaceView implements Runnable{
     public boolean onTouchEvent(MotionEvent event) {
         switch( event.getActionMasked() ){
             case MotionEvent.ACTION_DOWN:
-
+                if(gameEnded)
+                    startGame(context, screenWidth, screenHeight);
                 break;
             case MotionEvent.ACTION_UP:
 
