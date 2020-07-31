@@ -27,7 +27,7 @@ public class Player extends GraphicObject {
         this.y = screenHeight - this.bitMap.getHeight();
         this.movingLeft = false;
         this.movingRight = false;
-        this.xSpeed = 20;
+        this.xSpeed = 100;
         spawn();
     }
 
@@ -51,10 +51,12 @@ public class Player extends GraphicObject {
         //If player is moving, add speed
         if (this.playerIsAlive) {
             if (this.movingLeft) {
+                Log.d("Player/Update/Move", "moving left");
                 if (this.x >= 0)
                     this.x -= this.xSpeed;
             }
             if (this.movingRight) {
+                Log.d("Player/Update/Move", "moving right");
                 if (this.x <= this.screenWidth-this.bitMap.getWidth())
                     this.x += this.xSpeed;
             }
@@ -91,5 +93,14 @@ public class Player extends GraphicObject {
     @Override
     public Rect getHitBox() {
         return this.hitBox;
+    }
+
+    public void pressingRight(boolean setting) {
+        Log.d("Player/PressingRight", String.format("pressing right = %b", setting));
+        movingRight = setting;
+    }
+    public void pressingLeft(boolean setting) {
+        Log.d("Player/PressingLeft", String.format("pressing left = %b", setting));
+        movingLeft = setting;
     }
 }

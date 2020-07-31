@@ -41,17 +41,24 @@ public class MelonLordView extends SurfaceView implements Runnable{
     private Canvas canvas;
     private Paint paint;
 
+    //Button design
+    private Paint buttonPaint;
+    private int leftButtonXCoord;
+    private int leftButtonYCoord;
+    private int rightButtonXCoord;
+    private int rightButtonYCoord;
+    private int buttonWidth;
+    private int buttonHeight;
+    private int xRadiusButton;
+    private int yRadiusButton;
+    private int paddingButton;
+
     //Holder for drawing and updating
     private SurfaceHolder holder;
 
     private Player player;
     private List<FireBall> fireBallList = new CopyOnWriteArrayList<>();
     private PowerUp powerUp;
-    private int xLeftButtonCoord;
-    private int yLeftButtonCoord;
-    private int xRightButtonCoord;
-    private int yRightButtonCoord;
-    private int padding;
 
     //Drawing background image for game play to fit any phone screen
     DisplayMetrics bgMetrics;
@@ -59,6 +66,8 @@ public class MelonLordView extends SurfaceView implements Runnable{
     Bitmap bgBitmap;
     Rect frameToDraw;
     Rect whereToDraw;
+    private Rect leftButtonRect;
+    private Rect rightButtonRect;
 
     public MelonLordView(Context context, int screenWidth, int screenHeight) {
         super(context);
@@ -68,6 +77,23 @@ public class MelonLordView extends SurfaceView implements Runnable{
 
         holder            = getHolder();
         paint             = new Paint();
+
+        buttonPaint       = new Paint();
+        buttonWidth       = (int) (screenWidth * (.1428));
+        buttonHeight      = (int) (screenHeight * (.0714));
+        leftButtonXCoord  = paddingButton;
+        leftButtonYCoord  = (int) (screenHeight * .8000);
+        rightButtonXCoord = screenWidth - paddingButton - buttonWidth;
+        rightButtonYCoord = leftButtonYCoord;
+        xRadiusButton     = (int) (screenWidth * .0010);
+        yRadiusButton     = xRadiusButton;
+        leftButtonRect    = new Rect(leftButtonXCoord, leftButtonYCoord,
+                leftButtonXCoord + buttonWidth, leftButtonYCoord + buttonHeight);
+        rightButtonRect   = new Rect(rightButtonXCoord, rightButtonYCoord,
+                rightButtonXCoord + buttonWidth, rightButtonYCoord + buttonHeight);
+
+        xRadiusButton     = 50;
+        yRadiusButton     = 50;
 
         bgMetrics         = context.getResources().getDisplayMetrics();
         width             = bgMetrics.widthPixels;
@@ -100,7 +126,8 @@ public class MelonLordView extends SurfaceView implements Runnable{
                 BitmapFactory.decodeResource(context.getResources(),R.drawable.armor));
 
         gameEnded = false;
-
+        Log.d("View/StartGame", String.format("\nleftButtonRect = %s\nrightButtonRect = %s",
+                leftButtonRect.toShortString(), rightButtonRect.toShortString()));
     }//end startGame
 
     @Override
@@ -122,7 +149,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
         isPlaying = false;
         try {
             gameThread.join();
-        } catch (InterruptedException e) { System.out.println(e);}
+        } catch (InterruptedException e) { System.out.println(e.getStackTrace());}
     }//end pause
 
     private void control() {
@@ -131,7 +158,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
             // tempo of the game, can increase or decrease.
             gameThread.sleep(17); // in milliseconds
         } catch (InterruptedException e) {
-            System.out.print(e);
+            System.out.print(e.getStackTrace());
         }
 
     }//end control
@@ -195,20 +222,41 @@ public class MelonLordView extends SurfaceView implements Runnable{
             if (powerUp.isMoving())
                 canvas.drawBitmap(powerUp.getBitMap(),powerUp.getX(), powerUp.getY(), paint);
 
-            // DrawButtons
+            // Draw buttons
+            buttonPaint.setColor(Color.argb(200, 255,255,255));
+            // Draw Left Button
+            canvas.drawRoundRect(leftButtonXCoord, leftButtonYCoord,
+                    leftButtonXCoord + buttonWidth, leftButtonYCoord + buttonHeight,
+                    xRadiusButton, yRadiusButton, buttonPaint);
+            // Draw Right Button
+            canvas.drawRoundRect(rightButtonXCoord, rightButtonYCoord,
+                    rightButtonXCoord + buttonWidth, rightButtonYCoord + buttonHeight,
+                    xRadiusButton, yRadiusButton, buttonPaint);
+
             holder.unlockCanvasAndPost(canvas);
         }
     }//end draw
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        switch( event.getActionMasked() ){
+        Rect toucharea = new Rect((int)event.getX(), (int)event.getY(),
+                (int)event.getX(), (int)event.getY());
+        Log.d("View/TouchEvent", toucharea.toShortString());
+        switch(event.getActionMasked() ){
+            // TODO: Handle coords of the event to see if they are on either button.
             case MotionEvent.ACTION_DOWN:
+                if (Rect.intersects(leftButtonRect,toucharea)) {
+                    player.pressingLeft(true);
+                }
+                if (Rect.intersects(rightButtonRect, toucharea)) {
+                    player.pressingRight(true);
+                }
                 if(gameEnded)
                     startGame(context, screenWidth, screenHeight);
                 break;
             case MotionEvent.ACTION_UP:
-
+                player.pressingLeft(false);
+                player.pressingRight(false);
                 break;
         }
         return true;
