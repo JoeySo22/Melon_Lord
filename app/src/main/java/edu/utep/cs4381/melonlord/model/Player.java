@@ -25,8 +25,6 @@ public class Player extends GraphicObject {
         this.bitMapArmored = armor;
         this.x = (screenWidth/2) - (this.bitMap.getWidth()/2);
         this.y = screenHeight - this.bitMap.getHeight();
-        //x = 0;
-        //y = 0;
         this.movingLeft = false;
         this.movingRight = false;
         this.xSpeed = 20;
@@ -39,15 +37,14 @@ public class Player extends GraphicObject {
         this.armor = 5;
         Log.d("Player/Spawn", String.format("\nleft = %d\n top= %d\n right = %d\n bottom = %d",
                 this.x, this.y, this.x + this.bitMap.getWidth(), this.y + this.bitMap.getHeight()));
-        this.hitBox = new Rect(this.x, this.y, this.x + this.bitMap.getWidth(),
-                this.y + this.bitMap.getHeight());
+        this.hitBox = new Rect(this.x, this.y, this.bitMap.getWidth(),
+                this.bitMap.getHeight());
     }
 
     @Override
     protected void destroy() {
         this.playerIsAlive = false;
         // No hitbox, player is gone. View will not draw
-        this.hitBox = new Rect(this.x, this.y, this.x,this.y);
     }
 
     public void update(int s){
@@ -90,4 +87,9 @@ public class Player extends GraphicObject {
         armor--;
         return false;
     }
-}//end Player
+
+    @Override
+    public Rect getHitBox() {
+        return this.hitBox;
+    }
+}

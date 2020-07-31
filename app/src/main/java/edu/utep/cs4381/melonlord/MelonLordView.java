@@ -150,7 +150,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
         }
 
         // Check collisions with player and powerup
-        if (player.getHitBox().intersect(powerUp.getHitBox())) {
+        if (Rect.intersects(player.getHitBox(), powerUp.getHitBox())) {
             Log.d("View/Update","player hits powerup");
             powerUp.destroy();
             player.powerUp();
@@ -161,9 +161,11 @@ public class MelonLordView extends SurfaceView implements Runnable{
             if (Rect.intersects(player.getHitBox(), fb.getHitBox())) {
                 Log.d("View/Update","player hits fireball");
                 Log.d("View/Update", String.format(
-                        "\nplayerHitboxCorner = (%d,%d)\nfireballHitbox = (%d,%d)",
+                        "\nplayerCornerCoord = (%d,%d)\nfireballCornerCoord = (%d,%d)",
                         player.getX(), player.getY(), fb.getX(), fb.getY())
                 );
+                Log.d("View/Update", String.format("playerHitboxString = %s\nfireballHitboxString = %s",
+                        player.getHitBox().toShortString(), fb.getHitBox().toShortString()));
                 fb.destroy();
                 player.powerDown();
             }
