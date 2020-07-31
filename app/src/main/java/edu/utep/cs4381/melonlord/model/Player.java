@@ -25,6 +25,8 @@ public class Player extends GraphicObject {
         this.bitMapArmored = armor;
         this.x = (screenWidth/2) - (this.bitMap.getWidth()/2);
         this.y = screenHeight - this.bitMap.getHeight();
+        //x = 0;
+        //y = 0;
         this.movingLeft = false;
         this.movingRight = false;
         this.xSpeed = 20;
@@ -88,4 +90,4 @@ public class Player extends GraphicObject {
         armor--;
         return false;
     }
-}
+}//end Player

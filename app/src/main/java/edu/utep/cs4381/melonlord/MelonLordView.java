@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
@@ -177,6 +178,8 @@ public class MelonLordView extends SurfaceView implements Runnable{
 
             //Draw background image
             canvas.drawBitmap(bgBitmap, frameToDraw, whereToDraw, paint);
+            // Black background
+            //canvas.drawColor(Color.argb(255, 0, 0, 0));
 
             //Draw the character, sokka, the player will be playing as
             canvas.drawBitmap(player.getBitMap(),player.getX(), player.getY(), paint);
@@ -208,4 +211,4 @@ public class MelonLordView extends SurfaceView implements Runnable{
         }
         return true;
     }
-}
+}//end MelonLordView

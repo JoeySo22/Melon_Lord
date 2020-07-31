@@ -16,18 +16,20 @@ public class FireBall extends GraphicObject {
         this.maxY = this.screenHeight;
         this.minX = 0;
         this.minY = 0;
+
+        this.bitMap = bitmap;
+        hitBox = new Rect(this.x, this.y, this.bitMap.getWidth(), this.bitMap.getHeight());
         spawn();
     }
 
     @Override
     protected void spawn() {
-        this.x = rand.nextInt(this.screenWidth - this.bitMap.getWidth());
         this.ySpeed = rand.nextInt(45) + 40;
+        this.x = rand.nextInt(this.screenWidth - this.bitMap.getWidth());
         y = 0;
         //Log.d("Fireball/Spawn", String.format("\nleft = %d\n top= %d\n right = %d\n bottom = %d",
-          //      this.x, this.y, this.x + this.bitMap.getWidth(), this.y + this.bitMap.getHeight()));
-        hitBox = new Rect(this.x, this.y, this.x + this.bitMap.getWidth(),
-                this.y + this.bitMap.getHeight());
+        //      this.x, this.y, this.x + this.bitMap.getWidth(), this.y + this.bitMap.getHeight()));
+
     }
 
     @Override
@@ -43,8 +45,8 @@ public class FireBall extends GraphicObject {
             // Otherwise we increment its transposition
         else this.y += this.ySpeed;
         //Log.d("Fireball/Update", String.format("\nleft = %d\n top= %d\n right = %d\n bottom = %d",
-          //      this.x, this.y, this.x + this.bitMap.getWidth(), this.y + this.bitMap.getHeight()));
+        //      this.x, this.y, this.x + this.bitMap.getWidth(), this.y + this.bitMap.getHeight()));
         hitBox.set(this.x, this.y, this.x + this.bitMap.getWidth(),
                 this.y + this.bitMap.getHeight());
     }
-}
+}//end FireBall
