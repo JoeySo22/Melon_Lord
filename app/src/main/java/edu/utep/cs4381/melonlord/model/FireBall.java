@@ -3,6 +3,7 @@ package edu.utep.cs4381.melonlord.model;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.util.Log;
 
 public class FireBall extends GraphicObject {
 
@@ -11,19 +12,22 @@ public class FireBall extends GraphicObject {
     private int maxX, minX;
     public FireBall(Context context, int screenWidth, int screenHeight, Bitmap bitmap) {
         super(context, screenWidth, screenHeight, bitmap);
-        maxX = this.screenWidth;
-        maxY = this.screenHeight;
-        minX = 0;
-        minY = 0;
+        this.maxX = this.screenWidth;
+        this.maxY = this.screenHeight;
+        this.minX = 0;
+        this.minY = 0;
         spawn();
     }
 
     @Override
     protected void spawn() {
-        x = rand.nextInt(screenWidth - bitMap.getWidth());
-        ySpeed = rand.nextInt(45) + 40;
+        this.x = rand.nextInt(this.screenWidth - this.bitMap.getWidth());
+        this.ySpeed = rand.nextInt(45) + 40;
         y = 0;
-        hitBox = new Rect(x, y, bitMap.getWidth(), bitMap.getHeight());
+        //Log.d("Fireball/Spawn", String.format("\nleft = %d\n top= %d\n right = %d\n bottom = %d",
+          //      this.x, this.y, this.x + this.bitMap.getWidth(), this.y + this.bitMap.getHeight()));
+        hitBox = new Rect(this.x, this.y, this.x + this.bitMap.getWidth(),
+                this.y + this.bitMap.getHeight());
     }
 
     @Override
@@ -35,8 +39,12 @@ public class FireBall extends GraphicObject {
     @Override
     public void update(int speed) {
         // If the fireball reaches the screen we regenerate.
-        if (y >= screenHeight) destroy();
+        if (this.y >= this.screenHeight) destroy();
             // Otherwise we increment its transposition
-        else y += ySpeed;
+        else this.y += this.ySpeed;
+        //Log.d("Fireball/Update", String.format("\nleft = %d\n top= %d\n right = %d\n bottom = %d",
+          //      this.x, this.y, this.x + this.bitMap.getWidth(), this.y + this.bitMap.getHeight()));
+        hitBox.set(this.x, this.y, this.x + this.bitMap.getWidth(),
+                this.y + this.bitMap.getHeight());
     }
 }

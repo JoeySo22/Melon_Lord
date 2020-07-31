@@ -21,7 +21,7 @@ public class PowerUp extends GraphicObject {
         x = rand.nextInt(screenWidth - bitMap.getWidth());
         y = 0;
         ySpeed = rand.nextInt(45) + 40;
-        hitBox = new Rect(x, y, bitMap.getWidth(), bitMap.getHeight());
+        hitBox.set(x, y, x + bitMap.getWidth(), y + bitMap.getHeight());
     }
 
     @Override
@@ -32,20 +32,22 @@ public class PowerUp extends GraphicObject {
         y = screenHeight + 10;
         // set no longer to moving
         moving = false;
+        hitBox.set(x, y, x + bitMap.getWidth(), y + bitMap.getHeight());
     }
 
     @Override
     public void update(int speed) {
-        Log.d("PowerUp/Update", Boolean.toString(moving));
+        //Log.d("PowerUp/Update", Boolean.toString(moving));
         if (moving) {
             y += ySpeed;
-            Log.d("PowerUp/Update", "powerup incremented");
+            //Log.d("PowerUp/Update", "powerup incremented");
         } else {
             // Logic to get it spawned
             if (rand.nextDouble() <= .05)
                 spawn();
         }
         if (y >= screenHeight) destroy();
+        hitBox.set(x, y, x + bitMap.getWidth(), y + bitMap.getHeight());
     }
 
     public boolean isMoving() { return moving; }

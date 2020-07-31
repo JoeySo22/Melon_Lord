@@ -12,7 +12,7 @@ public abstract class GraphicObject extends GameObject {
     public GraphicObject(Context context, int screenWidth, int screenHeight, Bitmap bitMap){
         super(context, screenWidth, screenHeight);
         this.bitMap = bitMap;
-        this.hitBox = new Rect(this.x, this.y, this.bitMap.getWidth(), this.bitMap.getHeight());
+        this.hitBox = new Rect(x, y, bitMap.getWidth(), bitMap.getHeight());
     }
 
     public Bitmap getBitMap(){ return bitMap; }

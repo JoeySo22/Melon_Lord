@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -77,7 +78,9 @@ public class MelonLordView extends SurfaceView implements Runnable{
     private void startGame(Context context, int x, int y){
         //Initialize player at the start of the game
         player = new Player(context, x, y, BitmapFactory.decodeResource(context.getResources(),
-                R.drawable.sokka_10p_smaller));
+                R.drawable.sokka_10p_smaller),
+                BitmapFactory.decodeResource(context.getResources(), R.drawable.sokka_armor)
+        );
 
         //Scale the BACKGROUND image to any phone screen when the game starts
         bgBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.bg);
@@ -94,6 +97,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
         // Only 1 PowerUp per session
         powerUp = new PowerUp(context,screenWidth,screenHeight,
                 BitmapFactory.decodeResource(context.getResources(),R.drawable.armor));
+
         gameEnded = false;
 
     }//end startGame
@@ -146,12 +150,19 @@ public class MelonLordView extends SurfaceView implements Runnable{
 
         // Check collisions with player and powerup
         if (player.getHitBox().intersect(powerUp.getHitBox())) {
+            Log.d("View/Update","player hits powerup");
             powerUp.destroy();
             player.powerUp();
         }
+
         // Check collisions with player and fireball
         for (FireBall fb: fireBallList) {
-            if (player.getHitBox().intersect(fb.getHitBox())) {
+            if (Rect.intersects(player.getHitBox(), fb.getHitBox())) {
+                Log.d("View/Update","player hits fireball");
+                Log.d("View/Update", String.format(
+                        "\nplayerHitboxCorner = (%d,%d)\nfireballHitbox = (%d,%d)",
+                        player.getX(), player.getY(), fb.getX(), fb.getY())
+                );
                 fb.destroy();
                 player.powerDown();
             }
