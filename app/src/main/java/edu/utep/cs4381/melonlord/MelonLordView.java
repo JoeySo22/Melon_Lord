@@ -87,6 +87,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
         paint             = new Paint();
         textPaint         = new Paint();
 
+        //Drawing buttons information
         buttonPaint       = new Paint();
         buttonWidth       = (int) (screenWidth * (.1428));
         buttonHeight      = (int) (screenHeight * (.0714));
@@ -104,6 +105,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
         xRadiusButton     = 50;
         yRadiusButton     = 50;
 
+        //background information
         bgMetrics         = context.getResources().getDisplayMetrics();
         width             = bgMetrics.widthPixels;
         height            = bgMetrics.heightPixels;
@@ -129,7 +131,9 @@ public class MelonLordView extends SurfaceView implements Runnable{
         frameToDraw = new Rect(0, 0, bgBitmap.getWidth(), bgBitmap.getHeight());
         whereToDraw = new Rect(0, 0, screenWidth, screenHeight);
 
+        //clear fireballs at the start of every game and add new ones
         fireBallList.clear();
+
         // ADD ALL FIREBALL OBJECTS TO fireBallList
         for (int i = 1; i <= 4; i++)
             fireBallList.add(new FireBall(context,screenWidth,screenHeight,
@@ -140,8 +144,10 @@ public class MelonLordView extends SurfaceView implements Runnable{
                 BitmapFactory.decodeResource(context.getResources(),R.drawable.armor));
 
         gameEnded = false;
+
         Log.d("View/StartGame", String.format("\nleftButtonRect = %s\nrightButtonRect = %s",
                 leftButtonRect.toShortString(), rightButtonRect.toShortString()));
+
         timeStarted = System.currentTimeMillis();
     }//end startGame
 
@@ -201,6 +207,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
         // Check collisions with player and fireball
         for (FireBall fb: fireBallList) {
             if (Rect.intersects(player.getHitBox(), fb.getHitBox())) {
+
                 Log.d("View/Update","player hits fireball");
                 Log.d("View/Update", String.format(
                         "\nplayerCornerCoord = (%d,%d)\nfireballCornerCoord = (%d,%d)",
@@ -208,6 +215,8 @@ public class MelonLordView extends SurfaceView implements Runnable{
                 );
                 Log.d("View/Update", String.format("playerHitboxString = %s\nfireballHitboxString = %s",
                         player.getHitBox().toShortString(), fb.getHitBox().toShortString()));
+
+                //Destroy fireball and display a new one
                 fb.destroy();
                 gameEnded = player.powerDown();
                 break;
@@ -243,6 +252,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
 
                 if (powerUp.isMoving())
                     canvas.drawBitmap(powerUp.getBitMap(),powerUp.getX(), powerUp.getY(), paint);
+
                 // Draw buttons
                 buttonPaint.setColor(Color.argb(200, 255,255,255));
                 // Draw Left Button
@@ -253,7 +263,8 @@ public class MelonLordView extends SurfaceView implements Runnable{
                 canvas.drawRoundRect(rightButtonXCoord, rightButtonYCoord,
                         rightButtonXCoord + buttonWidth, rightButtonYCoord + buttonHeight,
                         xRadiusButton, yRadiusButton, buttonPaint);
-                // Draw Score Text
+
+                // Draw SCORE TEXT
                 textPaint.setColor(Color.argb(255,25,255,255));
                 textPaint.setTextSize(45);
                 textPaint.setTextAlign(Paint.Align.LEFT);
@@ -266,7 +277,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
                 textPaint.setTextSize(90);
                 canvas.drawText("Game Over!", screenWidth/2, screenHeight/2, textPaint);
                 textPaint.setTextSize(45);
-                canvas.drawText(formatTime("Best Time", longestTime), screenWidth/2,
+                canvas.drawText(formatTime("Best Time: ", longestTime), screenWidth/2,
                         (screenHeight/2) + 90, textPaint);
             }
 
@@ -276,16 +287,16 @@ public class MelonLordView extends SurfaceView implements Runnable{
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        Rect toucharea = new Rect((int)event.getX(), (int)event.getY(),
+        Rect touchArea = new Rect((int)event.getX(), (int)event.getY(),
                 (int)event.getX(), (int)event.getY());
-        Log.d("View/TouchEvent", toucharea.toShortString());
+        Log.d("View/TouchEvent", touchArea.toShortString());
         switch(event.getActionMasked() ){
             // TODO: Handle coords of the event to see if they are on either button.
             case MotionEvent.ACTION_DOWN:
-                if (Rect.intersects(leftButtonRect,toucharea)) {
+                if (Rect.intersects(leftButtonRect,touchArea)) {
                     player.pressingLeft(true);
                 }
-                if (Rect.intersects(rightButtonRect, toucharea)) {
+                if (Rect.intersects(rightButtonRect, touchArea)) {
                     player.pressingRight(true);
                 }
                 if(gameEnded)
