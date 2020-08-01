@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -20,11 +21,15 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SharedPreferences sharedPreferences;
-        sharedPreferences = getSharedPreferences("Hiscore", MODE_PRIVATE);
+        SharedPreferences preferences;
+        SharedPreferences.Editor editor;
+        preferences = getSharedPreferences("HISCORE", MODE_PRIVATE);
 
         //Code already in Melon Lord
         Button playButton = findViewById(R.id.startButton);
+        TextView textView = (TextView) findViewById(R.id.hiscore);
+        long longestTime = preferences.getLong("longestTime", 0);
+        textView.setText(String.format("Longest Time: %s seconds", longestTime));
         playButton.setOnClickListener(view -> {
             startActivity(new Intent(this, GameActivity.class));
             finish();

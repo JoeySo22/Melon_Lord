@@ -1,6 +1,7 @@
 package edu.utep.cs4381.melonlord;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -29,6 +30,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
     private final Context context;
     private final int screenWidth;
     private final int screenHeight;
+    private long longestTime;
 
     //Game thread
     private Thread gameThread;
@@ -69,6 +71,12 @@ public class MelonLordView extends SurfaceView implements Runnable{
     private Rect leftButtonRect;
     private Rect rightButtonRect;
 
+    private SharedPreferences preferences;
+    private SharedPreferences.Editor editor;
+    private long timeStarted;
+    private long timeTaken;
+    private Paint textPaint;
+
     public MelonLordView(Context context, int screenWidth, int screenHeight) {
         super(context);
         this.context      = context;
@@ -77,6 +85,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
 
         holder            = getHolder();
         paint             = new Paint();
+        textPaint         = new Paint();
 
         buttonPaint       = new Paint();
         buttonWidth       = (int) (screenWidth * (.1428));
@@ -99,6 +108,10 @@ public class MelonLordView extends SurfaceView implements Runnable{
         width             = bgMetrics.widthPixels;
         height            = bgMetrics.heightPixels;
 
+        preferences = context.getSharedPreferences("HISCORE", Context.MODE_PRIVATE);
+        editor = preferences.edit();
+        longestTime = preferences.getLong("longestTime",0);
+
         startGame(context, screenWidth, screenHeight);
     }
 
@@ -116,6 +129,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
         frameToDraw = new Rect(0, 0, bgBitmap.getWidth(), bgBitmap.getHeight());
         whereToDraw = new Rect(0, 0, screenWidth, screenHeight);
 
+        fireBallList.clear();
         // ADD ALL FIREBALL OBJECTS TO fireBallList
         for (int i = 1; i <= 4; i++)
             fireBallList.add(new FireBall(context,screenWidth,screenHeight,
@@ -128,6 +142,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
         gameEnded = false;
         Log.d("View/StartGame", String.format("\nleftButtonRect = %s\nrightButtonRect = %s",
                 leftButtonRect.toShortString(), rightButtonRect.toShortString()));
+        timeStarted = System.currentTimeMillis();
     }//end startGame
 
     @Override
@@ -156,7 +171,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
         try {
             // This slows down our CPU so that we can catch frames and changes.
             // tempo of the game, can increase or decrease.
-            gameThread.sleep(17); // in milliseconds
+            gameThread.sleep(2); // in milliseconds
         } catch (InterruptedException e) {
             System.out.print(e.getStackTrace());
         }
@@ -194,11 +209,20 @@ public class MelonLordView extends SurfaceView implements Runnable{
                 Log.d("View/Update", String.format("playerHitboxString = %s\nfireballHitboxString = %s",
                         player.getHitBox().toShortString(), fb.getHitBox().toShortString()));
                 fb.destroy();
-                player.powerDown();
+                gameEnded = player.powerDown();
+                break;
             }
         }
 
-        //
+        // Record time
+        if (!gameEnded) {
+            timeTaken = System.currentTimeMillis() - timeStarted;
+        } else {
+            if (timeTaken > longestTime) {
+                editor.putLong("longestTime", timeTaken);
+                longestTime = timeTaken;
+            }
+        }
     }//end update
 
     private void draw(){
@@ -209,29 +233,42 @@ public class MelonLordView extends SurfaceView implements Runnable{
             canvas.drawBitmap(bgBitmap, frameToDraw, whereToDraw, paint);
             // Black background
             //canvas.drawColor(Color.argb(255, 0, 0, 0));
-
             //Draw the character, sokka, the player will be playing as
-            canvas.drawBitmap(player.getBitMap(),player.getX(), player.getY(), paint);
+            if (!gameEnded){
+                canvas.drawBitmap(player.getBitMap(),player.getX(), player.getY(), paint);
+                //Draw fireballs falling down from top of the screen
+                for( FireBall fb: fireBallList ){
+                    canvas.drawBitmap(fb.getBitMap(),fb.getX(), fb.getY(), paint);
+                }
 
+                if (powerUp.isMoving())
+                    canvas.drawBitmap(powerUp.getBitMap(),powerUp.getX(), powerUp.getY(), paint);
+                // Draw buttons
+                buttonPaint.setColor(Color.argb(200, 255,255,255));
+                // Draw Left Button
+                canvas.drawRoundRect(leftButtonXCoord, leftButtonYCoord,
+                        leftButtonXCoord + buttonWidth, leftButtonYCoord + buttonHeight,
+                        xRadiusButton, yRadiusButton, buttonPaint);
+                // Draw Right Button
+                canvas.drawRoundRect(rightButtonXCoord, rightButtonYCoord,
+                        rightButtonXCoord + buttonWidth, rightButtonYCoord + buttonHeight,
+                        xRadiusButton, yRadiusButton, buttonPaint);
+                // Draw Score Text
+                textPaint.setColor(Color.argb(255,25,255,255));
+                textPaint.setTextSize(45);
+                textPaint.setTextAlign(Paint.Align.LEFT);
+                textPaint.setColor(Color.BLACK);
+                canvas.drawText(formatTime("Longest Time: ", timeTaken), 50, 50, textPaint);
 
-            //Draw fireballs falling down from top of the screen
-            for( FireBall fb: fireBallList ){
-                canvas.drawBitmap(fb.getBitMap(),fb.getX(), fb.getY(), paint);
+            } else {
+                textPaint.setColor(Color.argb(255,25,255,255));
+                textPaint.setTextAlign(Paint.Align.CENTER);
+                textPaint.setTextSize(90);
+                canvas.drawText("Game Over!", screenWidth/2, screenHeight/2, textPaint);
+                textPaint.setTextSize(45);
+                canvas.drawText(formatTime("Best Time", longestTime), screenWidth/2,
+                        (screenHeight/2) + 90, textPaint);
             }
-
-            if (powerUp.isMoving())
-                canvas.drawBitmap(powerUp.getBitMap(),powerUp.getX(), powerUp.getY(), paint);
-
-            // Draw buttons
-            buttonPaint.setColor(Color.argb(200, 255,255,255));
-            // Draw Left Button
-            canvas.drawRoundRect(leftButtonXCoord, leftButtonYCoord,
-                    leftButtonXCoord + buttonWidth, leftButtonYCoord + buttonHeight,
-                    xRadiusButton, yRadiusButton, buttonPaint);
-            // Draw Right Button
-            canvas.drawRoundRect(rightButtonXCoord, rightButtonYCoord,
-                    rightButtonXCoord + buttonWidth, rightButtonYCoord + buttonHeight,
-                    xRadiusButton, yRadiusButton, buttonPaint);
 
             holder.unlockCanvasAndPost(canvas);
         }
@@ -260,5 +297,10 @@ public class MelonLordView extends SurfaceView implements Runnable{
                 break;
         }
         return true;
+    }
+
+    // Time in milliseconds
+    private String formatTime(String label, long time) {
+        return String.format("%s:%d.%03ds", label, time/1000, time %1000);
     }
 }//end MelonLordView

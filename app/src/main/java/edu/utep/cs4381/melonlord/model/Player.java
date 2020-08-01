@@ -34,7 +34,7 @@ public class Player extends GraphicObject {
     @Override
     protected void spawn() {
         this.playerIsAlive = true;
-        this.armor = 5;
+        this.armor = 2;
         Log.d("Player/Spawn", String.format("\nleft = %d\n top= %d\n right = %d\n bottom = %d",
                 this.x, this.y, this.x + this.bitMap.getWidth(), this.y + this.bitMap.getHeight()));
         this.hitBox = new Rect(this.x, this.y, this.bitMap.getWidth(),
@@ -81,7 +81,7 @@ public class Player extends GraphicObject {
 
     // true if player died from powerdown
     public boolean powerDown() {
-        if (armor == 1){
+        if (armor <= 1){
             armor--;
             destroy();
             return true;
