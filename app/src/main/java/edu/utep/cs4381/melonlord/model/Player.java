@@ -43,8 +43,8 @@ public class Player extends GraphicObject {
 
     @Override
     protected void destroy() {
+        Log.d("Player/Destroy", "Player is dead.");
         this.playerIsAlive = false;
-        // No hitbox, player is gone. View will not draw
     }
 
     public void update(int s){
@@ -73,6 +73,7 @@ public class Player extends GraphicObject {
 
     // false if max armor has been reached
     public boolean powerUp() {
+        Log.d("Player/PowerUp", "Player powered up");
         if (armor == MAX_ARMOR)
             return false;
         armor++;
@@ -81,12 +82,12 @@ public class Player extends GraphicObject {
 
     // true if player died from powerdown
     public boolean powerDown() {
-        if (armor <= 1){
-            armor--;
+        Log.d("Player/PowerDown", "Player powered down");
+        armor--;
+        if (armor == 0){
             destroy();
             return true;
         }
-        armor--;
         return false;
     }
 
