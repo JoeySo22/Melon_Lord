@@ -15,6 +15,10 @@ public class PowerUp extends GraphicObject {
         // In here we don't spawn powerup right away. We roll the possibility
     }
 
+    public void setIsMoving(boolean moving){
+        this.moving = moving;
+    }
+
     @Override
     protected void spawn() {
         moving = true;
@@ -36,7 +40,7 @@ public class PowerUp extends GraphicObject {
     }
 
     @Override
-    public void update(int speed) {
+    public void update(int speed, boolean flag) {
         //Log.d("PowerUp/Update", Boolean.toString(moving));
         if (moving) {
             y += ySpeed;

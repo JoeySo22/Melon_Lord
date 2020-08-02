@@ -7,11 +7,10 @@ import android.util.Log;
 
 public class Player extends GraphicObject {
 
-    private static final int MAX_ARMOR = 5;
     protected Bitmap bitMapArmored;
     protected Bitmap bitmapUnarmored;
     protected Rect hitBox;
-    protected int armor;
+    protected int lives;
     public boolean playerIsAlive;
 
     //Set moving whether left or right
@@ -22,21 +21,26 @@ public class Player extends GraphicObject {
         super(context, screenWidth, screenHeight, noArmor);
         //player starts at these coordinates
         this.bitmapUnarmored = noArmor;
-        this.bitMapArmored = armor;
-        this.x = (screenWidth/2) - (this.bitMap.getWidth()/2);
-        this.y = screenHeight - this.bitMap.getHeight();
-        this.movingLeft = false;
-        this.movingRight = false;
-        this.xSpeed = 100;
+        this.bitMapArmored   = armor;
+        this.x               = (screenWidth/2) - (this.bitMap.getWidth()/2);
+        this.y               = screenHeight - this.bitMap.getHeight();
+        this.movingLeft      = false;
+        this.movingRight     = false;
+        this.xSpeed          = 100;
         spawn();
     }
 
+    public int getLives(){ return lives; }
+    public void removeLife(){ lives--; }
+
     @Override
     protected void spawn() {
-        this.playerIsAlive = true;
-        this.armor = 2;
+        playerIsAlive = true;
+        lives         = 3;
+
         Log.d("Player/Spawn", String.format("\nleft = %d\n top= %d\n right = %d\n bottom = %d",
                 this.x, this.y, this.x + this.bitMap.getWidth(), this.y + this.bitMap.getHeight()));
+
         this.hitBox = new Rect(this.x, this.y, this.bitMap.getWidth(),
                 this.bitMap.getHeight());
     }
@@ -47,7 +51,7 @@ public class Player extends GraphicObject {
         // No hitbox, player is gone. View will not draw
     }
 
-    public void update(int s){
+    public void update(int s, boolean flag){
         //If player is moving, add speed
         if (this.playerIsAlive) {
             if (this.movingLeft) {
@@ -61,33 +65,16 @@ public class Player extends GraphicObject {
                     this.x += this.xSpeed;
             }
         }
-        // Add more stuff
-        if (this.armor == 1)
-            this.bitMap = this.bitmapUnarmored;
-        else this.bitMap = this.bitMapArmored;
+        // If the player hits an armor, change the bitmap to Armored
+        if (flag)
+            this.bitMap = this.bitMapArmored;
+        else this.bitMap = this.bitmapUnarmored;
+
+
         Log.d("Player/Update", String.format("\nleft = %d\n top= %d\n right = %d\n bottom = %d",
                 this.x, this.y, this.x + this.bitMap.getWidth(), this.y + this.bitMap.getHeight()));
         this.hitBox.set(this.x, this.y, this.x + this.bitMap.getWidth(),
                 this.y + this.bitMap.getHeight());
-    }
-
-    // false if max armor has been reached
-    public boolean powerUp() {
-        if (armor == MAX_ARMOR)
-            return false;
-        armor++;
-        return true;
-    }
-
-    // true if player died from powerdown
-    public boolean powerDown() {
-        if (armor <= 1){
-            armor--;
-            destroy();
-            return true;
-        }
-        armor--;
-        return false;
     }
 
     @Override
