@@ -11,12 +11,14 @@ public class Player extends GraphicObject {
     protected Bitmap bitMapArmored;
     protected Bitmap bitmapUnarmored;
     protected Rect hitBox;
-    protected int armor;
+    protected int lives;
     public boolean playerIsAlive;
 
     //Set moving whether left or right
     private boolean movingLeft;
     private boolean movingRight;
+    private boolean powerUpActivated;
+    private int powerUpCount;
 
     public Player(Context context, int screenWidth, int screenHeight, Bitmap noArmor, Bitmap armor){
         super(context, screenWidth, screenHeight, noArmor);
@@ -33,8 +35,9 @@ public class Player extends GraphicObject {
 
     @Override
     protected void spawn() {
+        bitMap = bitmapUnarmored;
         this.playerIsAlive = true;
-        this.armor = 2;
+        this.lives = 2;
         Log.d("Player/Spawn", String.format("\nleft = %d\n top= %d\n right = %d\n bottom = %d",
                 this.x, this.y, this.x + this.bitMap.getWidth(), this.y + this.bitMap.getHeight()));
         this.hitBox = new Rect(this.x, this.y, this.bitMap.getWidth(),
@@ -47,6 +50,7 @@ public class Player extends GraphicObject {
         // No hitbox, player is gone. View will not draw
     }
 
+    @Override
     public void update(int s){
         //If player is moving, add speed
         if (this.playerIsAlive) {
@@ -61,34 +65,31 @@ public class Player extends GraphicObject {
                     this.x += this.xSpeed;
             }
         }
-        // Add more stuff
-        if (this.armor == 1)
-            this.bitMap = this.bitmapUnarmored;
-        else this.bitMap = this.bitMapArmored;
         Log.d("Player/Update", String.format("\nleft = %d\n top= %d\n right = %d\n bottom = %d",
                 this.x, this.y, this.x + this.bitMap.getWidth(), this.y + this.bitMap.getHeight()));
         this.hitBox.set(this.x, this.y, this.x + this.bitMap.getWidth(),
                 this.y + this.bitMap.getHeight());
+
+        // updates the counter when powered up
+        if (powerUpActivated) {
+            powerUpCount--;
+            if (powerUpCount == 0)  {
+                powerUpActivated = false;
+                bitMap = bitmapUnarmored;
+            }
+        }
     }
 
     // false if max armor has been reached
-    public boolean powerUp() {
-        if (armor == MAX_ARMOR)
-            return false;
-        armor++;
-        return true;
+    public void powerUpActivate() {
+        powerUpCount = 20;
+        bitMap = bitMapArmored;
+        powerUpActivated = true;
     }
 
     // true if player died from powerdown
-    public boolean powerDown() {
-        if (armor <= 1){
-            armor--;
-            destroy();
-            return true;
-        }
-        armor--;
-        return false;
-    }
+
+
 
     @Override
     public Rect getHitBox() {
@@ -102,5 +103,25 @@ public class Player extends GraphicObject {
     public void pressingLeft(boolean setting) {
         Log.d("Player/PressingLeft", String.format("pressing left = %b", setting));
         movingLeft = setting;
+    }
+
+    public int getLives() {
+        return lives;
+    }
+
+    public boolean isPoweredUp() {
+        return powerUpActivated;
+    }
+
+    public boolean isAlive() { return playerIsAlive; }
+
+    // takes Hit decrements the life. returns if player is dead. Player is dead == Game is Over
+    public boolean takesHit() {
+        lives--;
+        if (lives == 0) {
+            destroy();
+            return true;
+        }
+        else return false;
     }
 }

@@ -25,6 +25,6 @@ public abstract class GameObject {
     public boolean isMoving() { return moving; }
 
     //Update is abstract and has its own implementation for Player and Villain
-    public abstract void update(int speed, boolean flag);
+    public abstract void update(int speed);
 
 }

@@ -82,7 +82,6 @@ public class MelonLordView extends SurfaceView implements Runnable{
 
     //Field used for sounds
     private SoundEffect soundEffect;
-    private boolean sentinel;
 
     public MelonLordView(Context context, int screenWidth, int screenHeight) {
         super(context);
@@ -155,7 +154,6 @@ public class MelonLordView extends SurfaceView implements Runnable{
 
         gameEnded     = false;
         hasPowerUpOn  = false;
-        sentinel      = true;
 
         //Make Toph Speak at the beginning of the game to make things interesting
         soundEffect.play(SoundEffect.Sound.IM_NOT_TOPH);
@@ -201,62 +199,49 @@ public class MelonLordView extends SurfaceView implements Runnable{
 
     private void update(){
         //update player speed
-        if(!hasPowerUpOn)
-            player.update(0, false); //unarmored
-        else
-            player.update(0,true);   //armored
+        player.update(0);
 
         //update powerup speed
-        powerUp.update(0, false);
+        powerUp.update(0);
 
         //update fireball speed
         for (FireBall fb: fireBallList) {
-            fb.update(0, false);
+            fb.update(0);
         }
 
         // Check collisions with player and powerup
         if (Rect.intersects(player.getHitBox(), powerUp.getHitBox())) {
-            player.update(0,true);
-            hasPowerUpOn = true;
+            player.powerUpActivate();
             Log.d("View/Update","player hits powerup");
             powerUp.destroy();
         }
 
         // Check collisions with player and fireball
-        for (FireBall fb: fireBallList) {
-            if (Rect.intersects(player.getHitBox(), fb.getHitBox())) {
+        if (player.isAlive()) {
+            for (FireBall fb: fireBallList) {
+                if (Rect.intersects(player.getHitBox(), fb.getHitBox())) {
+                    Log.d("View/Update","player hits fireball");
+                    Log.d("View/Update", String.format(
+                            "\nplayerCornerCoord = (%d,%d)\nfireballCornerCoord = (%d,%d)",
+                            player.getX(), player.getY(), fb.getX(), fb.getY())
+                    );
+                    Log.d("View/Update", String.format("playerHitboxString = %s\nfireballHitboxString = %s",
+                            player.getHitBox().toShortString(), fb.getHitBox().toShortString()));
 
-                Log.d("View/Update","player hits fireball");
-                Log.d("View/Update", String.format(
-                        "\nplayerCornerCoord = (%d,%d)\nfireballCornerCoord = (%d,%d)",
-                        player.getX(), player.getY(), fb.getX(), fb.getY())
-                );
-                Log.d("View/Update", String.format("playerHitboxString = %s\nfireballHitboxString = %s",
-                        player.getHitBox().toShortString(), fb.getHitBox().toShortString()));
+                    if (!player.isPoweredUp())
+                        gameEnded = player.takesHit();
 
-                //Destroy fireball and display a new one
-                fb.destroy();
+                    // Play sounds
+                    if (player.getLives() == 1)
+                        soundEffect.play(SoundEffect.Sound.WATCH_IT_TOPH);
+                    else soundEffect.play(SoundEffect.Sound.IM_NOT_TOPH);
 
-                //If player has power up on, nothing happens, else life is removed
-                if(hasPowerUpOn){
-                    System.out.println("Player has power up on");
-                    //there was a hit, so remove armor but not life
-                    hasPowerUpOn = false;
-                } else{
-                    player.removeLife();
+                    //Destroy fireball and display a new one
+                    fb.destroy();
                 }
-
-                if(player.getLives() < 1)
-                    gameEnded = true;
             }
         }
 
-
-        //If player is in their second life, Sokka say "Watch it Toph"
-        if(player.getLives() == 1 && sentinel ) {
-            soundEffect.play(SoundEffect.Sound.WATCH_IT_TOPH);
-            sentinel = false; //make sound play right away
-        }
 
         // Record time
         if (!gameEnded) {
@@ -285,7 +270,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
                 }
 
                 //only show the powerUp if the player does not currently already have it
-                if (powerUp.isMoving() && !hasPowerUpOn)
+                if (powerUp.isMoving())
                     canvas.drawBitmap(powerUp.getBitMap(),powerUp.getX(), powerUp.getY(), paint);
 
                 // Draw buttons
@@ -312,6 +297,8 @@ public class MelonLordView extends SurfaceView implements Runnable{
                 textPaint.setTextAlign(Paint.Align.CENTER);
                 textPaint.setColor(Color.BLACK);
                 canvas.drawText("Lives: " + player.getLives(),80, 50, textPaint);
+                //if (player.isPoweredUp())
+                  //  canvas.drawText("POWERED UP", )
 
 
             } else {

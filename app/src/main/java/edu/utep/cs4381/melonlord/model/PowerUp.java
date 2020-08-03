@@ -40,13 +40,13 @@ public class PowerUp extends GraphicObject {
     }
 
     @Override
-    public void update(int speed, boolean flag) {
+    public void update(int speed) {
         //Log.d("PowerUp/Update", Boolean.toString(moving));
         if (moving) {
             y += ySpeed;
             //Log.d("PowerUp/Update", "powerup incremented");
         } else {
-            // Logic to get it spawned
+            //todo: Make into 10 seconds it shows up.
             if (rand.nextDouble() <= .05)
                 spawn();
         }

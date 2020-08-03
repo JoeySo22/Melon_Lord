@@ -37,7 +37,7 @@ public class FireBall extends GraphicObject {
     }
 
     @Override
-    public void update(int speed, boolean flag) {
+    public void update(int speed) {
         // If the fireball reaches the screen we regenerate.
         if (this.y >= this.screenHeight) destroy();
             // Otherwise we increment its transposition
