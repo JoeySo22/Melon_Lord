@@ -23,7 +23,7 @@ public class FireBall extends GraphicObject {
     protected void spawn() {
         this.x = rand.nextInt(this.screenWidth - this.bitMap.getWidth());
         this.ySpeed = rand.nextInt(45) + 40;
-        y = 0;
+        this.y = 0;
         //Log.d("Fireball/Spawn", String.format("\nleft = %d\n top= %d\n right = %d\n bottom = %d",
           //      this.x, this.y, this.x + this.bitMap.getWidth(), this.y + this.bitMap.getHeight()));
         hitBox = new Rect(this.x, this.y, this.bitMap.getWidth(),
@@ -37,7 +37,7 @@ public class FireBall extends GraphicObject {
     }
 
     @Override
-    public void update(int speed) {
+    public void update(int speed, boolean flag) {
         // If the fireball reaches the screen we regenerate.
         if (this.y >= this.screenHeight) destroy();
             // Otherwise we increment its transposition

@@ -20,6 +20,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import edu.utep.cs4381.melonlord.model.FireBall;
 import edu.utep.cs4381.melonlord.model.Player;
 import edu.utep.cs4381.melonlord.model.PowerUp;
+import edu.utep.cs4381.melonlord.model.SoundEffect;
 
 /** Authors:
  *  Jose Eduardo Soto <jesoto4@miners.utep.edu>
@@ -61,6 +62,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
     private Player player;
     private List<FireBall> fireBallList = new CopyOnWriteArrayList<>();
     private PowerUp powerUp;
+    private boolean hasPowerUpOn;
 
     //Drawing background image for game play to fit any phone screen
     DisplayMetrics bgMetrics;
@@ -68,6 +70,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
     Bitmap bgBitmap;
     Rect frameToDraw;
     Rect whereToDraw;
+
     private Rect leftButtonRect;
     private Rect rightButtonRect;
 
@@ -76,6 +79,10 @@ public class MelonLordView extends SurfaceView implements Runnable{
     private long timeStarted;
     private long timeTaken;
     private Paint textPaint;
+
+    //Field used for sounds
+    private SoundEffect soundEffect;
+    private boolean sentinel;
 
     public MelonLordView(Context context, int screenWidth, int screenHeight) {
         super(context);
@@ -87,6 +94,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
         paint             = new Paint();
         textPaint         = new Paint();
 
+        //Drawing buttons information
         buttonPaint       = new Paint();
         buttonWidth       = (int) (screenWidth * (.1428));
         buttonHeight      = (int) (screenHeight * (.0714));
@@ -104,45 +112,58 @@ public class MelonLordView extends SurfaceView implements Runnable{
         xRadiusButton     = 50;
         yRadiusButton     = 50;
 
+        //background information
         bgMetrics         = context.getResources().getDisplayMetrics();
         width             = bgMetrics.widthPixels;
         height            = bgMetrics.heightPixels;
 
-        preferences = context.getSharedPreferences("HISCORE", Context.MODE_PRIVATE);
-        editor = preferences.edit();
-        longestTime = preferences.getLong("longestTime",0);
+        preferences       = context.getSharedPreferences("HISCORE", Context.MODE_PRIVATE);
+        editor            = preferences.edit();
+        longestTime       = preferences.getLong("longestTime",0);
+
+        //sound effects
+        soundEffect       = new SoundEffect(context);
 
         startGame(context, screenWidth, screenHeight);
     }
 
     private void startGame(Context context, int x, int y){
         //Initialize player at the start of the game
-        player = new Player(context, x, y, BitmapFactory.decodeResource(context.getResources(),
+        player      = new Player(context, x, y, BitmapFactory.decodeResource(context.getResources(),
                 R.drawable.sokka_10p_smaller),
                 BitmapFactory.decodeResource(context.getResources(), R.drawable.sokka_armor)
         );
 
         //Scale the BACKGROUND image to any phone screen when the game starts
-        bgBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.bg);
-        bgBitmap = Bitmap.createScaledBitmap(bgBitmap, width, height, false);
+        bgBitmap    = BitmapFactory.decodeResource(context.getResources(), R.drawable.bg);
+        bgBitmap    = Bitmap.createScaledBitmap(bgBitmap, width, height, false);
 
         frameToDraw = new Rect(0, 0, bgBitmap.getWidth(), bgBitmap.getHeight());
         whereToDraw = new Rect(0, 0, screenWidth, screenHeight);
 
+        //clear fireballs at the start of every game and add new ones
         fireBallList.clear();
+
         // ADD ALL FIREBALL OBJECTS TO fireBallList
         for (int i = 1; i <= 4; i++)
             fireBallList.add(new FireBall(context,screenWidth,screenHeight,
-                    BitmapFactory.decodeResource(context.getResources(), R.drawable.fireball_smaller)));
+                    BitmapFactory.decodeResource(context.getResources(), R.drawable.fireball_12p_size)));
 
         // Only 1 PowerUp per session
-        powerUp = new PowerUp(context,screenWidth,screenHeight,
+        powerUp       = new PowerUp(context,screenWidth,screenHeight,
                 BitmapFactory.decodeResource(context.getResources(),R.drawable.armor));
 
-        gameEnded = false;
+        gameEnded     = false;
+        hasPowerUpOn  = false;
+        sentinel      = true;
+
+        //Make Toph Speak at the beginning of the game to make things interesting
+        soundEffect.play(SoundEffect.Sound.IM_NOT_TOPH);
+
         Log.d("View/StartGame", String.format("\nleftButtonRect = %s\nrightButtonRect = %s",
                 leftButtonRect.toShortString(), rightButtonRect.toShortString()));
-        timeStarted = System.currentTimeMillis();
+
+        timeStarted   = System.currentTimeMillis();
     }//end startGame
 
     @Override
@@ -179,28 +200,32 @@ public class MelonLordView extends SurfaceView implements Runnable{
     }//end control
 
     private void update(){
-
         //update player speed
-        player.update(0);
+        if(!hasPowerUpOn)
+            player.update(0, false); //unarmored
+        else
+            player.update(0,true);   //armored
 
         //update powerup speed
-        powerUp.update(0);
+        powerUp.update(0, false);
 
         //update fireball speed
         for (FireBall fb: fireBallList) {
-            fb.update(0);
+            fb.update(0, false);
         }
 
         // Check collisions with player and powerup
         if (Rect.intersects(player.getHitBox(), powerUp.getHitBox())) {
+            player.update(0,true);
+            hasPowerUpOn = true;
             Log.d("View/Update","player hits powerup");
             powerUp.destroy();
-            player.powerUp();
         }
 
         // Check collisions with player and fireball
         for (FireBall fb: fireBallList) {
             if (Rect.intersects(player.getHitBox(), fb.getHitBox())) {
+
                 Log.d("View/Update","player hits fireball");
                 Log.d("View/Update", String.format(
                         "\nplayerCornerCoord = (%d,%d)\nfireballCornerCoord = (%d,%d)",
@@ -208,10 +233,29 @@ public class MelonLordView extends SurfaceView implements Runnable{
                 );
                 Log.d("View/Update", String.format("playerHitboxString = %s\nfireballHitboxString = %s",
                         player.getHitBox().toShortString(), fb.getHitBox().toShortString()));
+
+                //Destroy fireball and display a new one
                 fb.destroy();
-                gameEnded = player.powerDown();
-                break;
+
+                //If player has power up on, nothing happens, else life is removed
+                if(hasPowerUpOn){
+                    System.out.println("Player has power up on");
+                    //there was a hit, so remove armor but not life
+                    hasPowerUpOn = false;
+                } else{
+                    player.removeLife();
+                }
+
+                if(player.getLives() < 1)
+                    gameEnded = true;
             }
+        }
+
+
+        //If player is in their second life, Sokka say "Watch it Toph"
+        if(player.getLives() == 1 && sentinel ) {
+            soundEffect.play(SoundEffect.Sound.WATCH_IT_TOPH);
+            sentinel = false; //make sound play right away
         }
 
         // Record time
@@ -231,8 +275,7 @@ public class MelonLordView extends SurfaceView implements Runnable{
 
             //Draw background image
             canvas.drawBitmap(bgBitmap, frameToDraw, whereToDraw, paint);
-            // Black background
-            //canvas.drawColor(Color.argb(255, 0, 0, 0));
+
             //Draw the character, sokka, the player will be playing as
             if (!gameEnded){
                 canvas.drawBitmap(player.getBitMap(),player.getX(), player.getY(), paint);
@@ -241,8 +284,10 @@ public class MelonLordView extends SurfaceView implements Runnable{
                     canvas.drawBitmap(fb.getBitMap(),fb.getX(), fb.getY(), paint);
                 }
 
-                if (powerUp.isMoving())
+                //only show the powerUp if the player does not currently already have it
+                if (powerUp.isMoving() && !hasPowerUpOn)
                     canvas.drawBitmap(powerUp.getBitMap(),powerUp.getX(), powerUp.getY(), paint);
+
                 // Draw buttons
                 buttonPaint.setColor(Color.argb(200, 255,255,255));
                 // Draw Left Button
@@ -253,12 +298,21 @@ public class MelonLordView extends SurfaceView implements Runnable{
                 canvas.drawRoundRect(rightButtonXCoord, rightButtonYCoord,
                         rightButtonXCoord + buttonWidth, rightButtonYCoord + buttonHeight,
                         xRadiusButton, yRadiusButton, buttonPaint);
-                // Draw Score Text
+
+                // Draw SCORE TEXT
                 textPaint.setColor(Color.argb(255,25,255,255));
                 textPaint.setTextSize(45);
                 textPaint.setTextAlign(Paint.Align.LEFT);
                 textPaint.setColor(Color.BLACK);
-                canvas.drawText(formatTime("Longest Time: ", timeTaken), 50, 50, textPaint);
+                canvas.drawText(formatTime("Longest Time: ", timeTaken), 450, 50, textPaint);
+
+                // DRAW LIVES TEXT
+                textPaint.setColor( Color.argb(255,25,255,255) );
+                textPaint.setTextSize(45);
+                textPaint.setTextAlign(Paint.Align.CENTER);
+                textPaint.setColor(Color.BLACK);
+                canvas.drawText("Lives: " + player.getLives(),80, 50, textPaint);
+
 
             } else {
                 textPaint.setColor(Color.argb(255,25,255,255));
@@ -266,8 +320,11 @@ public class MelonLordView extends SurfaceView implements Runnable{
                 textPaint.setTextSize(90);
                 canvas.drawText("Game Over!", screenWidth/2, screenHeight/2, textPaint);
                 textPaint.setTextSize(45);
-                canvas.drawText(formatTime("Best Time", longestTime), screenWidth/2,
+                canvas.drawText(formatTime("Best Time: ", longestTime), screenWidth/2,
                         (screenHeight/2) + 90, textPaint);
+                textPaint.setTextSize(45);
+                canvas.drawText("TAP TO PLAY AGAIN",screenWidth/2,
+                        (screenHeight/2) + 140, textPaint );
             }
 
             holder.unlockCanvasAndPost(canvas);
@@ -276,16 +333,16 @@ public class MelonLordView extends SurfaceView implements Runnable{
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        Rect toucharea = new Rect((int)event.getX(), (int)event.getY(),
+        Rect touchArea = new Rect((int)event.getX(), (int)event.getY(),
                 (int)event.getX(), (int)event.getY());
-        Log.d("View/TouchEvent", toucharea.toShortString());
+        Log.d("View/TouchEvent", touchArea.toShortString());
         switch(event.getActionMasked() ){
             // TODO: Handle coords of the event to see if they are on either button.
             case MotionEvent.ACTION_DOWN:
-                if (Rect.intersects(leftButtonRect,toucharea)) {
+                if (Rect.intersects(leftButtonRect,touchArea)) {
                     player.pressingLeft(true);
                 }
-                if (Rect.intersects(rightButtonRect, toucharea)) {
+                if (Rect.intersects(rightButtonRect, touchArea)) {
                     player.pressingRight(true);
                 }
                 if(gameEnded)
